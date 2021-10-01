@@ -43,6 +43,9 @@ class SIR:
 		self.X_n = np.zeros((totalIter,self.population))
 
 		for i in range(totalIter):
-			print(self.X_n[i])
+			"""
+			TODO: This needs to be fixed
+			rands = np.random.rand(self.population)
 
-
+			X_n[i] = np.where(rand > self.P[X_n[i],0], )
+			"""
