@@ -49,3 +49,8 @@ class SIR:
 
 			X_n[i] = np.where(rand > self.P[X_n[i],0], )
 			"""
+
+	def plot(self):
+		"""
+		Prøv å bruke imshow() på matrisa!!!
+		"""
