@@ -7,10 +7,6 @@ class SIR:
 
 		self.population = population
 
-		self.alpha = alpha
-		self.beta = beta
-		self.gamma = gamma
-
 		self.P = np.array([
 			[1-beta, beta, 0],
 			[0, 1-gamma, gamma],
@@ -25,18 +21,12 @@ class SIR:
 		self.population = population
 
 	def updateParams(self, alpha, beta, gamma):
-		self.alpha = alpha
-		self.beta = beta
-		self.gamma = gamma
 
 		self.P = np.array([
 			[1-beta, beta, 0],
 			[0, 1-gamma, gamma],
 			[alpha, 0, 1-alpha]
 		])
-
-	def params(self):
-		return np.array([self.alpha, self.beta, self.gamma])
 
 	def simulate(self, years):
 		# Find total amount of needed iterations
@@ -59,6 +49,12 @@ class SIR:
 
 		for i in range(self.totalDays):
 			self.X_n[i].sort()
+
+	def simulateDependence(self, years):
+
+		self.totalDays = int(years*self.daysInYear)
+
+		self.X_n = np.zeros((self.totalDays,self.population))
 
 	def plot(self):
 
