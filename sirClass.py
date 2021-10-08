@@ -1,11 +1,15 @@
 import numpy as np
+from scipy import stats as st
 from matplotlib import pyplot as plt
 
 class SIR: 
-	def __init__(self, population, alpha, beta, gamma):
-		self.daysInYear = 365
+	def __init__(self, population, alpha, beta, gamma, years):
 
 		self.population = population
+
+		self.alpha = alpha
+		self.beta = beta
+		self.gamma = gamma
 
 		self.P = np.array([
 			[1-beta, beta, 0],
@@ -13,28 +17,41 @@ class SIR:
 			[alpha, 0, 1-alpha]
 		])
 
-		self.X_n = np.array([])
-
-		self.z_alpha = 1.96
+		self.years = years
+		self.totalDays = int(years*365)
+		self.X_n = np.zeros((self.totalDays,self.population))
+		
+		self.z_alpha = 1.697
 
 	def updatePopulation(self, population):
 		self.population = population
 
 	def updateParams(self, alpha, beta, gamma):
 
+		self.alpha = alpha
+		self.beta = beta
+		self.gamma = gamma
+
 		self.P = np.array([
 			[1-beta, beta, 0],
 			[0, 1-gamma, gamma],
 			[alpha, 0, 1-alpha]
 		])
 
-	def simulate(self, years):
-		# Find total amount of needed iterations
-		self.totalDays = int(years*self.daysInYear)
+	def setInitialState(self,S=1000,I=0,R=0):
 
-		self.X_n = np.zeros((self.totalDays,self.population))
+		if S+I+R != self.population:
+			S = self.population - (I+R)
 
-		for i in range(self.totalDays):
+		susceptible = np.zeros(S)
+		infected = np.ones(I)
+		recovered = np.ones(R)*2
+
+		self.X_n[0] = np.concatenate((susceptible,infected,recovered))
+
+	def simulate(self):
+
+		for i in range(1,self.totalDays):
 			# Double for loop solution
 			for j in range(self.population):
 
@@ -50,11 +67,27 @@ class SIR:
 		for i in range(self.totalDays):
 			self.X_n[i].sort()
 
-	def simulateDependence(self, years):
+	def simulateDependence(self):
 
-		self.totalDays = int(years*self.daysInYear)
+		for i in range(1,self.totalDays):
+			# Update parameters to get chance of infection dependant on amount in state 1
 
-		self.X_n = np.zeros((self.totalDays,self.population))
+			self.updateParams(self.alpha, (0.5*np.sum(self.X_n[i-1] == 1))/self.population ,self.gamma)
+
+			for j in range(self.population):
+
+				if np.random.random() > self.P[int(self.X_n[i-1,j]),int(self.X_n[i-1,j])]:
+					self.X_n[i,j] = self.X_n[i-1,j] + 1
+				else:
+					self.X_n[i,j] = self.X_n[i-1,j]
+				
+				if self.X_n[i,j] == 3:
+					self.X_n[i,j] = 0
+
+
+		for i in range(self.totalDays):
+			self.X_n[i].sort()
+
 
 	def plot(self):
 
@@ -76,39 +109,24 @@ class SIR:
 
 		return stateFirst,stateSecond,stateThird
 
-	def numericalLimitingDistributions(self, n=30, years=20, v=False):
+	def numericalLimitingDistributions(self, n=30, v=False):
 
 		results = np.zeros((n,3))
 
 		for i in range(n):
-			self.simulate(years)
+			self.simulate()
 			results[i] = self.countStateDays(v=False)
-
-		# Calculating statistical variables
-		means = np.zeros(len(results[0]))
-
-		for i in range(len(means)):
-			means[i] = sum(results[:,i])/n
-
-		stds = np.zeros(len(means))
-
-		for i in range(len(means)):
-			sm = 0
-			for j in range(n):
-				sm += (results[j,i] - means[i])**2
-
-			stds[i] = np.sqrt(sm/(n-1))
-
+			
 		# Calculate error estimates: 
-		CIs = np.zeros(len(means))
+		CIs = np.zeros((3,2))
 
 		for i in range(len(CIs)):
-			CIs[i] = self.z_alpha*np.sqrt(stds[i]**2/n)
+			CIs[i,0], CIs[i,1] = st.t.interval(0.95, n-1, loc=np.mean(results[:,i]), scale=st.sem(results[:,i]))
+
 
 		if v:
 			print(f"CIs: ")
-			for i in range(len(means)):
-				print(f"State: {i}, CI: {means[i]:.2f}±{CIs[i]:.2f}")
+			for i in range(len(CIs)):
+				print(f"State: {i}, Lower/Upper: {2*CIs[i,0]/self.years:.2f}, {2*CIs[i,1]/self.years:.2f}")
 
-		self.means = means
 		self.CI = CIs

@@ -1,16 +1,14 @@
 # This is the file containing the Markov-chain simulation
 
-import numpy as np
 from sirClass import SIR
 
-sir = SIR(1000,0.005,0.01,0.1)
 
-sir.simulate(20)
+def problem1c():
+	# Simulate for 20 years using given parameters
 
-lonelySir = SIR(1,0.005,0.01,0.1)
+	sir = SIR(population=1, alpha=0.005, beta=0.01, gamma=0.1, years=20)
 
-lonelySir.numericalLimitingDistributions(years=2, v=True)
+	sir.numericalLimitingDistributions(v=True)
 
-print(lonelySir.totalDays)
 
-sir.plot()
+problem1c()
