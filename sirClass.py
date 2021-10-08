@@ -19,6 +19,8 @@ class SIR:
 
 		self.X_n = np.array([])
 
+		self.z_alpha = 1.96
+
 	def updatePopulation(self, population):
 		self.population = population
 
@@ -46,7 +48,7 @@ class SIR:
 			# Double for loop solution
 			for j in range(self.population):
 
-				if np.random.random() > self.P[int(self.X_n[i,j]),int(self.X_n[i,j])]:
+				if np.random.random() > self.P[int(self.X_n[i-1,j]),int(self.X_n[i-1,j])]:
 					self.X_n[i,j] = self.X_n[i-1,j] + 1
 				else:
 					self.X_n[i,j] = self.X_n[i-1,j]
@@ -59,51 +61,58 @@ class SIR:
 			self.X_n[i].sort()
 
 	def plot(self):
-		"""
-		Prøv å bruke imshow() på matrisa!!!
-		"""
 
 		plt.figure(0)
 		plt.imshow(self.X_n.T)
 		plt.show()
 
-	def countStateDays(self):
+	def countStateDays(self, v=True):
 		stateFirst = np.sum(self.X_n[int(self.totalDays/2):,0] == 0)
 		stateSecond = np.sum(self.X_n[int(self.totalDays/2):,0] == 1)
 		stateThird = np.sum(self.X_n[int(self.totalDays/2):,0] == 2)
 
-		print(f"Absolute numbers of days in different states: ")
-		print(f"S: {stateFirst:8}, I: {stateSecond:8}, R: {stateThird:8}.")
+		if v:
+			print(f"Absolute numbers of days in different states: ")
+			print(f"S: {stateFirst:8}, I: {stateSecond:8}, R: {stateThird:8}.")
 
-		print(f"Relative numbers of days in different states: ")
-		print(f"S: {2*stateFirst/self.totalDays:8.2f}, I: {2*stateSecond/self.totalDays:8.2f}, R: {2*stateThird/self.totalDays:8.2f}.")
-		
-	
-	def limiting_distribution(self):
-		
-		# lager en null-matrise med samme dimensjoner som self
-		limProbMatrix = np.zeros(self.shape())
-		
-		# Itererer gjennom matrisen elementvis
-		for i in range(len(self)):
-			for j in range(len(self)):
-				
-				# limeting probability er definert slik at rad-elementene i self kan brukes som kolonnelementer i limProbMatrix
-				limProbMatrix[i,j] = self[j,i]
-				
-				# Vi må gjøre litt om på limProbMatrix for at ting skal funke optimalt. Vi trekker fra 1 i [i,i] elementet i limProbMatrix
-				# for da kan vi definere løsningsmatrisen som [0,0,0] hvilket er digg
-				if i==j:
-					limProbMatrix[i,j] = self[i,j] - 1 
-				
-				# Det vi egt har gjort her er å gjøre noen lineære ligninger om til en matrise, men nå har vi lyst til å bytte ut den siste 
-				# "ligningen", eller raden til limProbMatrix, med x + y + z = 1. Dette gjør vi av grunner som jeg ikke skjønner, men 
-				# foreleseren mener det er bedre
-				if j==(len(self)-1):
-					self[j,i] = 1 
-		
-		# løser ligningssystemet
-		solvedLimProb = np.solve(self, [0,0,1])
-		
-		# returnerer en array med løsningene... tror jeg
-		return solvedLimProb
+			print(f"Relative numbers of days in different states: ")
+			print(f"S: {2*stateFirst/self.totalDays:8.2f}, I: {2*stateSecond/self.totalDays:8.2f}, R: {2*stateThird/self.totalDays:8.2f}.")
+
+		return stateFirst,stateSecond,stateThird
+
+	def numericalLimitingDistributions(self, n=30, years=20, v=False):
+
+		results = np.zeros((n,3))
+
+		for i in range(n):
+			self.simulate(years)
+			results[i] = self.countStateDays(v=False)
+
+		# Calculating statistical variables
+		means = np.zeros(len(results[0]))
+
+		for i in range(len(means)):
+			means[i] = sum(results[:,i])/n
+
+		stds = np.zeros(len(means))
+
+		for i in range(len(means)):
+			sm = 0
+			for j in range(n):
+				sm += (results[j,i] - means[i])**2
+
+			stds[i] = np.sqrt(sm/(n-1))
+
+		# Calculate error estimates: 
+		CIs = np.zeros(len(means))
+
+		for i in range(len(CIs)):
+			CIs[i] = self.z_alpha*np.sqrt(stds[i]**2/n)
+
+		if v:
+			print(f"CIs: ")
+			for i in range(len(means)):
+				print(f"State: {i}, CI: {means[i]:.2f}±{CIs[i]:.2f}")
+
+		self.means = means
+		self.CI = CIs
