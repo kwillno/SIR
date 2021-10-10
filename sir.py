@@ -11,4 +11,24 @@ def problem1c():
 	sir.numericalLimitingDistributions(v=True)
 
 
-problem1c()
+def problem1e():
+	# Simulate Y_n for n=300 timesteps
+
+	sir = SIR(population=1000)
+
+	# Set inital state
+	sir.setInitialState(S=950, I=50, R=0)
+
+	# Set timestep limit to n=300
+	sir.totalDays = 300
+	sir.X_n = sir.X_n[:300]
+
+	sir.simulateWithDependence()
+
+	sir.graphSIR()
+
+
+
+
+#problem1c()
+problem1e()

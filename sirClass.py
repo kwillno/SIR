@@ -3,7 +3,7 @@ from scipy import stats as st
 from matplotlib import pyplot as plt
 
 class SIR: 
-	def __init__(self, population, alpha, beta, gamma, years):
+	def __init__(self, population, alpha=0.005, beta=0.01, gamma=0.1, years=20):
 
 		self.population = population
 
@@ -67,7 +67,7 @@ class SIR:
 		for i in range(self.totalDays):
 			self.X_n[i].sort()
 
-	def simulateDependence(self):
+	def simulateWithDependence(self):
 
 		for i in range(1,self.totalDays):
 			# Update parameters to get chance of infection dependant on amount in state 1
@@ -94,6 +94,30 @@ class SIR:
 		plt.figure(0)
 		plt.imshow(self.X_n.T)
 		plt.show()
+
+	def graphSIR(self):
+
+		S = np.zeros(len(self.X_n))
+		I = S.copy()
+
+		R = S.copy()
+
+		axis = np.linspace(0,len(S),len(S))
+
+		for i in range(len(S)):
+			S[i] = np.count_nonzero(self.X_n[i] == 0)
+			I[i] = np.count_nonzero(self.X_n[i] == 1)
+			R[i] = np.count_nonzero(self.X_n[i] == 2)
+
+		plt.figure("SIR")
+		plt.title("SIR-plot")
+		plt.plot(axis, S, label="Susceptible")
+		plt.plot(axis, I, label="Infected")
+		plt.plot(axis, R, label="Recovered")
+		plt.plot(axis, S+I+R, label="Sum")
+		plt.legend()
+		plt.show()
+
 
 	def countStateDays(self, v=True):
 		stateFirst = np.sum(self.X_n[int(self.totalDays/2):,0] == 0)
@@ -127,6 +151,6 @@ class SIR:
 		if v:
 			print(f"CIs: ")
 			for i in range(len(CIs)):
-				print(f"State: {i}, Lower/Upper: {2*CIs[i,0]/self.years:.2f}, {2*CIs[i,1]/self.years:.2f}")
+				print(f"State: {i}, Lower/Upper: {2*CIs[i,0]/self.years:.2f}, {2*CIs[i,1]/self.years:.2f}, size: {np.abs(2*CIs[i,0]/self.years - 2*CIs[i,1]/self.years):.2f}")
 
 		self.CI = CIs
