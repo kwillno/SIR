@@ -201,3 +201,7 @@ class SIR:
 
 		print(f"95% CI for max I: \t[{CI_maxI[0]:.3f},\t {CI_maxI[1]:.3f}], diff: {np.abs(CI_maxI[0] - CI_maxI[1]):.3f}")
 		print(f"95% CI for arg max I: \t[{CI_argmaxI[0]:.3f},\t {CI_argmaxI[1]:.3f}], diff: {np.abs(CI_argmaxI[0] - CI_argmaxI[1]):.3f}")
+		
+	
+def poisson(lam, t, N):
+		return ((lam*t)^N)/(N!))*e**(-lam*t)
