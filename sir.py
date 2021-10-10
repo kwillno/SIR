@@ -2,6 +2,7 @@
 
 from sirClass import SIR
 import numpy as np
+import matplotlib.pyplot as plt
 
 def problem1c():
 	# Simulate for 20 years using given parameters
@@ -39,10 +40,47 @@ def problem1f(n=300,sims=1000):
 	sir.totalDays = n
 	sir.X_n = sir.X_n[:n]
 
-	sir.findMaxInfected(simulations=sims, v=True)
+	sir.findMaxInfectedCIs(simulations=sims, v=True)
 
+def problem1g():
+	# Simulate Y_n for n=300 timesteps
+
+	sir = SIR(population=1000)
+
+
+	vaccinationRate = [0,100,600,800]
+
+	for i in range(len(vaccinationRate)):
+		# Set inital state
+		sir.setInitialState(I=50, R=0, V=vaccinationRate[i])
+
+		# Set timestep limit to n=300
+		sir.totalDays = 300
+		sir.X_n = sir.X_n[:300]
+
+		sir.simulateWithDependence()
+
+		maxI, argmaxI = sir.findMaxInfected()
+
+		print(f"Vaccinated: {vaccinationRate[i]},  Max Infected: {maxI},\t Time of max infected I: {argmaxI}")
+
+		sir.graphSIR(show=False, index=i)
+
+	for i in range(1,len(vaccinationRate)):
+		# Set inital state
+		sir.setInitialState(I=50, R=0, V=vaccinationRate[i])
+
+		# Set timestep limit to n=300
+		sir.totalDays = 300
+		sir.X_n = sir.X_n[:300]
+
+		print(f"\n\nVaccinationrate: {vaccinationRate[i]}")
+		sir.findMaxInfectedCIs(simulations=100, states=[50,0,vaccinationRate[i]])
+
+	plt.show()
 
 
 # problem1c()
 # problem1e()
-problem1f(sims = 10)
+# problem1f(sims = 10)
+problem1g()
