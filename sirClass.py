@@ -192,7 +192,7 @@ class SIR:
 		
 	
 def poisson_bool(lam, t, N):
-		return np.random.random() > ((lam*t)^N)/(N!))*e**(-lam*t)
+		return np.random.random() > ((lam*t)^N)/(N!)*e**(-lam*t)
 
 def simulate_poisson_CI(lam, t, N, maxiter):
 	realizations = 0
