@@ -47,6 +47,7 @@ class SIR:
 		infected = np.ones(I)
 		recovered = np.ones(R)*2
 
+		self.X_n[:,:] = 0
 		self.X_n[0] = np.concatenate((susceptible,infected,recovered))
 
 	def simulate(self):
@@ -154,3 +155,37 @@ class SIR:
 				print(f"State: {i}, Lower/Upper: {2*CIs[i,0]/self.years:.2f}, {2*CIs[i,1]/self.years:.2f}, size: {np.abs(2*CIs[i,0]/self.years - 2*CIs[i,1]/self.years):.2f}")
 
 		self.CI = CIs
+
+
+	def findMaxInfected(self, simulations=100, v=False):
+
+		maxI = np.zeros(simulations)
+		argmaxI = maxI.copy()
+
+		for i in range(len(maxI)):
+			if v and i > 0:
+				print(f"Working on {i+1} of {len(maxI)}\tMean max I: {np.mean(maxI[:i]):.2f}, Mean argmax I: {np.mean(argmaxI[:i]):2f}", end="\r")
+			# Restart simulation
+			self.setInitialState(S=950, I=50)
+			self.simulateWithDependence()
+
+			maxI_n = 1
+			for j in range(len(self.X_n)):
+				I_n = np.count_nonzero(self.X_n[j] == 1)
+				if I_n > maxI_n:
+					maxI_n = I_n
+					argmaxI_n = j
+
+			maxI[i]    = maxI_n
+			argmaxI[i] = argmaxI_n 
+
+		print() # Removes carriage return
+		print(f"Mean max I: {np.mean(maxI)}, Mean argmax I: {np.mean(argmaxI)}")
+
+		n = len(maxI)
+
+		CI_maxI = st.t.interval(0.95, n-1, loc=np.mean(maxI), scale=st.sem(maxI))
+		CI_argmaxI = st.t.interval(0.95, n-1, loc=np.mean(argmaxI), scale=st.sem(argmaxI))
+
+		print(f"95% CI for max I: \t[{CI_maxI[0]:.3f},\t {CI_maxI[1]:.3f}], diff: {np.abs(CI_maxI[0] - CI_maxI[1]):.3f}")
+		print(f"95% CI for arg max I: \t[{CI_argmaxI[0]:.3f},\t {CI_argmaxI[1]:.3f}], diff: {np.abs(CI_argmaxI[0] - CI_argmaxI[1]):.3f}")
