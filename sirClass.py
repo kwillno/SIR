@@ -121,10 +121,10 @@ class SIR:
 			for j in range(len(self.X_n)):
 				SIRV[i,j] = np.count_nonzero(self.X_n[j] == i)
 
-		plt.figure("SIRV"+str(index))
+		plt.figure("SIRV")#+str(index))
 		plt.title("SIR-plot")
 		for i in range(len(SIRV)):
-			plt.plot(axis, SIRV[i], label=SIRVlabel[i])
+			plt.plot(axis, SIRV[i],label=f"{SIRVlabel[i]}")
 		plt.ylim([0,self.population])
 		plt.legend()
 		if show:

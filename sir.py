@@ -50,6 +50,8 @@ def problem1g():
 
 	vaccinationRate = [0,100,600,800]
 
+	fig, axs = plt.subplots(2, 2)
+
 	for i in range(len(vaccinationRate)):
 		# Set inital state
 		sir.setInitialState(I=50, R=0, V=vaccinationRate[i])
@@ -64,7 +66,27 @@ def problem1g():
 
 		print(f"Vaccinated: {vaccinationRate[i]},  Max Infected: {maxI},\t Time of max infected I: {argmaxI}")
 
-		sir.graphSIR(show=False, index=i)
+		# Plotting in one figure
+		X_i = sir.X_n
+
+		SIRV = np.zeros((4,len(X_i)))
+		SIRVlabel = ["Susceptible", "Infected", "Recovered", "Vaccinated"]
+		coor = [(0,0),(0,1),(1,0),(1,1)]
+
+		axis = np.linspace(0,len(X_i),len(X_i))
+
+		for j in range(len(SIRV)):
+			for k in range(len(X_i)):
+				SIRV[j,k] = np.count_nonzero(X_i[k] == j)
+
+
+		subplt = axs[coor[i]]
+		subplt.set_title(f"SIR-plot {i}")
+		for j in range(len(SIRV)):
+			subplt.plot(axis, SIRV[j],label=f"{SIRVlabel[j]}")
+		subplt.set_ylim([0,sir.population])
+		subplt.legend()
+
 
 	for i in range(1,len(vaccinationRate)):
 		# Set inital state
