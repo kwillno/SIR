@@ -9,7 +9,11 @@ def problem1c():
 
 	sir = SIR(population=1, alpha=0.005, beta=0.01, gamma=0.1, years=20)
 
+	sir.simulate()
+
+	sir.countStateDays()
 	sir.numericalLimitingDistributions(v=True)
+
 
 
 def problem1e():
@@ -105,4 +109,4 @@ def problem1g():
 # problem1c()
 # problem1e()
 # problem1f(sims = 10)
-problem1g()
+# problem1g()

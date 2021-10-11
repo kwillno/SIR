@@ -123,7 +123,7 @@ class SIR:
 
 		plt.figure("SIRV")#+str(index))
 		plt.title("SIR-plot")
-		for i in range(len(SIRV)):
+		for i in range(len(SIRV)-1):
 			plt.plot(axis, SIRV[i],label=f"{SIRVlabel[i]}")
 		plt.ylim([0,self.population])
 		plt.legend()
@@ -138,6 +138,9 @@ class SIR:
 		if v:
 			print(f"Absolute numbers of days in different states: ")
 			print(f"S: {stateFirst:8}, I: {stateSecond:8}, R: {stateThird:8}.")
+
+			print(f"Numbers of days in different states per year: ")
+			print(f"S: {2*stateFirst/self.years:8}, I: {2*stateSecond/self.years:8}, R: {2*stateThird/self.years:8}.")
 
 			print(f"Relative numbers of days in different states: ")
 			print(f"S: {2*stateFirst/self.totalDays:8.2f}, I: {2*stateSecond/self.totalDays:8.2f}, R: {2*stateThird/self.totalDays:8.2f}.")
