@@ -75,7 +75,7 @@ def problem1g():
 		sir.X_n = sir.X_n[:300]
 
 		print(f"\n\nVaccinationrate: {vaccinationRate[i]}")
-		sir.findMaxInfectedCIs(simulations=100, states=[50,0,vaccinationRate[i]])
+		sir.findMaxInfectedCIs(simulations=10, states=[50,0,vaccinationRate[i]])
 
 	plt.show()
 
