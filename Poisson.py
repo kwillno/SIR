@@ -1,3 +1,6 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
 def poisson_bool(lam, t, N):
     poisson_sum = 0
     for i in range(N+1):
