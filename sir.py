@@ -85,7 +85,7 @@ def problem1g():
 
 
 		subplt = axs[coor[i]]
-		subplt.set_title(f"SIR-plot {i}")
+		subplt.set_title(f"Vaccinated: {vaccinationRate[i]}")
 		for j in range(len(SIRV)):
 			subplt.plot(axis, SIRV[j],label=f"{SIRVlabel[j]}")
 		subplt.set_ylim([0,sir.population])
@@ -101,12 +101,12 @@ def problem1g():
 		sir.X_n = sir.X_n[:300]
 
 		print(f"\n\nVaccinationrate: {vaccinationRate[i]}")
-		sir.findMaxInfectedCIs(simulations=10, states=[50,0,vaccinationRate[i]])
+		sir.findMaxInfectedCIs(simulations=1000, states=[50,0,vaccinationRate[i]])
 
 	plt.show()
 
 
 # problem1c()
 # problem1e()
-# problem1f(sims = 10)
+problem1f(sims = 1000)
 # problem1g()

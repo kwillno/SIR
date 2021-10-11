@@ -1,0 +1,3 @@
+Mean max I: 524.473, Mean argmax I: 11.872
+95% CI for max I: 	[523.168,	 525.778], diff: 2.610
+95% CI for arg max I: 	[11.821,	 11.923], diff: 0.102
