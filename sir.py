@@ -7,11 +7,14 @@ import matplotlib.pyplot as plt
 def problem1c():
 	# Simulate for 20 years using given parameters
 
+	# Set up the simulation
 	sir = SIR(population=1, alpha=0.005, beta=0.01, gamma=0.1, years=20)
 
+	# Actually run the simulation
 	sir.simulate()
 
-	sir.countStateDays()
+	# Give output
+	sir.countStateDays(v=True)
 	sir.numericalLimitingDistributions(v=True)
 
 
@@ -28,8 +31,10 @@ def problem1e():
 	sir.totalDays = 300
 	sir.X_n = sir.X_n[:300]
 
+	# Run simulation
 	sir.simulateWithDependence()
 
+	# Plot the results of the simulation
 	sir.graphSIR()
 
 
@@ -51,11 +56,11 @@ def problem1g():
 
 	sir = SIR(population=1000)
 
-
+	# The different situations we are interested in.
 	vaccinationRate = [0,100,600,800]
 
+	# Ploting all scenarios in same figure.
 	fig, axs = plt.subplots(2, 2)
-
 	for i in range(len(vaccinationRate)):
 		# Set inital state
 		sir.setInitialState(I=50, R=0, V=vaccinationRate[i])
@@ -91,7 +96,8 @@ def problem1g():
 		subplt.set_ylim([0,sir.population])
 		subplt.legend()
 
-
+	# Find 95% confidence intervals for peak infected and when this occurs
+	# using 1000 simualtions. 
 	for i in range(1,len(vaccinationRate)):
 		# Set inital state
 		sir.setInitialState(I=50, R=0, V=vaccinationRate[i])
@@ -106,7 +112,7 @@ def problem1g():
 	plt.show()
 
 
-# problem1c()
-# problem1e()
-# problem1f(sims = 1000)
-# problem1g()
+problem1c()
+problem1e()
+problem1f(sims = 1000)
+problem1g()

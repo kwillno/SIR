@@ -77,7 +77,6 @@ class SIR:
 		"""
 
 		for i in range(1,self.totalDays):
-			# Double for loop solution
 			for j in range(self.population):
 
 				if np.random.random() > self.P[int(self.X_n[i-1,j]),int(self.X_n[i-1,j])]:
@@ -103,19 +102,21 @@ class SIR:
 		"""
 
 		for i in range(1,self.totalDays):
-			# Update parameters to get chance of infection dependant on amount in state 1
 
+			# Update parameters to get chance of infection dependant on amount in state 1
 			self.updateParams(self.alpha, (0.5*np.sum(self.X_n[i-1] == 1))/self.population ,self.gamma)
 
 			for j in range(self.population):
 
 				if self.X_n[i-1,j] == 3:
 					# Special case if state == 3 (Vaccinated)
+					# State cannot be changed.
 					self.X_n[i,j] = 3
 
 				elif self.X_n[i-1,j] == 2:
 					# Special case if state == 2 (Recovered)
 					if np.random.random() > self.P[int(self.X_n[i-1,j]),int(self.X_n[i-1,j])]:
+						# Can only transition to state 0 (Susceptible)
 						self.X_n[i,j] = 0
 					else:
 						self.X_n[i,j] = 2
@@ -127,7 +128,8 @@ class SIR:
 					else:
 						self.X_n[i,j] = self.X_n[i-1,j]
 
-
+		# Sorting array for current timestep for clarity. 
+		# This can be skipped if runtime is essential.
 		for i in range(self.totalDays):
 			self.X_n[i].sort()
 
@@ -157,10 +159,12 @@ class SIR:
 
 		axis = np.linspace(0,len(self.X_n),len(self.X_n))
 
+		# Counting
 		for i in range(len(SIRV)):
 			for j in range(len(self.X_n)):
 				SIRV[i,j] = np.count_nonzero(self.X_n[j] == i)
 
+		# Plotting
 		plt.figure("SIRV")
 		plt.title("SIR-plot")
 		for i in range(len(SIRV)-1):
@@ -194,6 +198,12 @@ class SIR:
 		return stateFirst,stateSecond,stateThird
 
 	def numericalLimitingDistributions(self, n=30, v=False):
+		"""
+		Calculates limiting distributions for timesteps spent in each state 
+		for the second half of the simulation. 
+		Returns 95% confidence intervals in percentages.
+		Prints in days per year in each state. 
+		"""
 
 		results = np.zeros((n,3))
 
@@ -205,6 +215,8 @@ class SIR:
 		CIs = np.zeros((3,2))
 
 		for i in range(len(CIs)):
+			# Using student t's distribution as variance is not known.
+			# Could also use normal-distribution here.
 			CIs[i,0], CIs[i,1] = st.t.interval(0.95, n-1, loc=np.mean(results[:,i]), scale=st.sem(results[:,i]))
 
 
@@ -216,6 +228,10 @@ class SIR:
 		self.CI = CIs
 
 	def findMaxInfected(self):
+		"""
+		Find peak number of infected and when this peak occurs.
+		"""
+
 		maxI_n = 1
 		for j in range(len(self.X_n)):
 			I_n = np.count_nonzero(self.X_n[j] == 1)
@@ -228,6 +244,10 @@ class SIR:
 
 
 	def findMaxInfectedCIs(self, simulations=100, v=False, states=[50,0,0]):
+		"""
+		Find 95% confidence intervals for how many are infected at peak
+		and when peak occurs.
+		"""
 
 		maxI = np.zeros(simulations)
 		argmaxI = maxI.copy()
@@ -246,6 +266,8 @@ class SIR:
 
 		n = len(maxI)
 
+		# Again using student t distribution as variance is unknown.
+		# Could also use normal distribution.
 		CI_maxI = st.t.interval(0.95, n-1, loc=np.mean(maxI), scale=st.sem(maxI))
 		CI_argmaxI = st.t.interval(0.95, n-1, loc=np.mean(argmaxI), scale=st.sem(argmaxI))
 
