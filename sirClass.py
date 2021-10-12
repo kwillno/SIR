@@ -4,9 +4,14 @@ from matplotlib import pyplot as plt
 
 class SIR: 
 	def __init__(self, population, alpha=0.005, beta=0.01, gamma=0.1, years=20):
+		"""
+		Initializes new instace of class SIR.
+		
+		Main purpose is to set member-variables that are
+		used and modified by multiple methods.
+		"""
 
-		self.population = population
-
+		# Builds transition probabiliy matrix
 		self.alpha = alpha
 		self.beta = beta
 		self.gamma = gamma
@@ -18,16 +23,18 @@ class SIR:
 			[      0,       0,       0,      1]
 		])
 
+		# Sets simulation variables and stores these in each instance of SIR.
+		self.population = population
 		self.years = years
 		self.totalDays = int(years*365)
 		self.X_n = np.zeros((self.totalDays,self.population))
-		
-		self.z_alpha = 1.697
-
-	def updatePopulation(self, population):
-		self.population = population
 
 	def updateParams(self, alpha, beta, gamma):
+		"""
+		Updates transition probabilites and rebuilds 
+		transmission probability matrix, rewriting the previous 
+		in the member vairable P.
+		"""
 
 		self.alpha = alpha
 		self.beta = beta
@@ -41,6 +48,12 @@ class SIR:
 		])
 
 	def setInitialState(self,S=1000,I=0,R=0,V=0):
+		"""
+		Sets initial state of simulation.
+		Used to simulate the start of an outbreak.
+
+		Takes into account user error in populations.
+		"""
 
 		if S+I+R+V != self.population:
 			S = self.population - (I+R+V)
@@ -54,6 +67,14 @@ class SIR:
 		self.X_n[0] = np.concatenate((susceptible,infected,recovered,vaccinated))
 
 	def simulate(self):
+		"""
+		Simple simulation function.
+		Only uses upper left 3x3 of P, vaccinated state does not exist.
+
+		Uses the probabilities along the diagonal of P to check if state should be updated.
+		In the case that is not kept same, it will always transition to the next state, 
+		here being the state that has the index one number larger 0 -> 1 -> 2.
+		"""
 
 		for i in range(1,self.totalDays):
 			# Double for loop solution
@@ -72,6 +93,14 @@ class SIR:
 			self.X_n[i].sort()
 
 	def simulateWithDependence(self):
+		"""
+		Advanced simulation function.
+		Accounts for vaccinations and 
+		
+		Uses the probabilities along the diagonal of P to check if state should be updated.
+		In the case that is not kept same, it will always transition to the next state, 
+		here being the state that has the index one number larger 0 -> 1 -> 2.
+		"""
 
 		for i in range(1,self.totalDays):
 			# Update parameters to get chance of infection dependant on amount in state 1
@@ -104,13 +133,24 @@ class SIR:
 
 
 	def plot(self):
+		"""
+		Diagnostic function used to find errors in simulation. 
+		Plots the transpose of the X_n matrix whixh is sorted. 
+		Gives an approximation to the output of graphSIR() with much less calculation.
+		
+		Not used in current implementation.
+		"""
 
 		plt.figure(0)
 		plt.imshow(self.X_n.T)
 		plt.show()
 
 
-	def graphSIR(self, show=True, index=0):
+	def graphSIR(self, show=True):
+		"""
+		Function for plotting the counts of the states through time. 
+		Counts up # of individuals in each state for each timestep and displays this data in a plot.
+		"""
 
 		SIRV = np.zeros((4,len(self.X_n)))
 		SIRVlabel = ["Susceptible", "Infected", "Recovered", "Vaccinated"]
@@ -121,7 +161,7 @@ class SIR:
 			for j in range(len(self.X_n)):
 				SIRV[i,j] = np.count_nonzero(self.X_n[j] == i)
 
-		plt.figure("SIRV")#+str(index))
+		plt.figure("SIRV")
 		plt.title("SIR-plot")
 		for i in range(len(SIRV)-1):
 			plt.plot(axis, SIRV[i],label=f"{SIRVlabel[i]}")
@@ -131,6 +171,12 @@ class SIR:
 			plt.show()
 
 	def countStateDays(self, v=True):
+		"""
+		Counts number of days in each state when simualtion has population equal to one.
+
+		Used to calculate the limiting distribution numerically.
+		"""
+
 		stateFirst = np.sum(self.X_n[int(self.totalDays/2):,0] == 0)
 		stateSecond = np.sum(self.X_n[int(self.totalDays/2):,0] == 1)
 		stateThird = np.sum(self.X_n[int(self.totalDays/2):,0] == 2)
@@ -155,7 +201,7 @@ class SIR:
 			self.simulate()
 			results[i] = self.countStateDays(v=False)
 			
-		# Calculate error estimates: 
+		# Calculate confidence intervals
 		CIs = np.zeros((3,2))
 
 		for i in range(len(CIs)):

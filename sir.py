@@ -108,5 +108,5 @@ def problem1g():
 
 # problem1c()
 # problem1e()
-problem1f(sims = 1000)
+# problem1f(sims = 1000)
 # problem1g()

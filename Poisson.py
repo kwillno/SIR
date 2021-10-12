@@ -33,7 +33,7 @@ def make_exp_t_arr(lam):
         t_vals = np.append(t_vals,val)
     return t_vals
 
-def simulate_poisson(lam, t, N, simulation_n=10):
+def simulate_poisson(lam, t=59, simulation_n=10):
     colors = ["c","m","y","k","r","g","b", "mediumspringgreen", "sandybrown", "mistyrose"]
     for i in range(simulation_n):
         #y_val = np.array([0, 1])
@@ -53,10 +53,12 @@ def simulate_poisson(lam, t, N, simulation_n=10):
     plt.ylabel("#claims")
     plt.grid()
     plt.show()
+
+simulate_poisson(1.5)
     
 # PROBLEM 2B
     
-    def claim_amount_P(t, gamma, lam):
+def claim_amount_P(t, gamma, lam):
     C = 0
     X = np.random.poisson(lam*t)
     for j in range(X):
@@ -73,7 +75,7 @@ def claim_amount_arr(t, gamma, lam):
 def total_claim_amount_P(t, gamma, lam, N):
     C = np.array([])
     for i in range(N):
-        claim = claim_amount(t, gamma, lam)
+        claim = claim_amount_P(t, gamma, lam)
         C = np.append(C, claim)
     claims_over_8mill = 0
     for elem in C:
@@ -82,7 +84,7 @@ def total_claim_amount_P(t, gamma, lam, N):
     P = claims_over_8mill/len(C)
     return P
 
-def plot_claim_amounts(t, gamma, lam):
+def plot_claim_amounts(lam, t=59, gamma=10):
     print(f'The amount of claims exceeding 8 million: {total_claim_amount_P(t, gamma, lam, 1000)}')
     colors = ["c","m","y","k","r","g","b", "mediumspringgreen", "sandybrown", "mistyrose"]
     for i in range(10):
@@ -101,3 +103,5 @@ def plot_claim_amounts(t, gamma, lam):
     plt.ylabel("claim amount (in millions kr)")
     plt.grid()
     plt.show()
+
+plot_claim_amounts(1.5)
