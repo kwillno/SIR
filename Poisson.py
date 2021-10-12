@@ -124,6 +124,7 @@ def total_claim_amount_P(t, gamma, lam, N):
 
 
 # this function prints the money-claim amounts
+# This function works in much the same way as simulate_poisson(), only that we use claim amounts as y values
 def plot_claim_amounts(lam, t=59, gamma=10):
     print(f'The amount of claims exceeding 8 million: {total_claim_amount_P(t, gamma, lam, 1000)}')
     colors = ["c","m","y","k","r","g","b", "mediumspringgreen", "sandybrown", "mistyrose"]
@@ -134,10 +135,8 @@ def plot_claim_amounts(lam, t=59, gamma=10):
         for k in range(len(exp_t)):
             if k>0:
                 exp_t[k] += exp_t[k-1]
-                #y_val[k] = y_val[k-1] + np.random.poisson(lam*exp_t_copy[k])
         for j in range(len(exp_t)-1):
-            plt.hlines(y_val[j], exp_t[j], exp_t[j+1], colors[i])
-            
+            plt.hlines(y_val[j], exp_t[j], exp_t[j+1], colors[i])  
     plt.title("Insurance Claim amounts")
     plt.xlabel("Days")
     plt.ylabel("claim amount (in millions kr)")
