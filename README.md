@@ -10,6 +10,6 @@ The class `SIR` has not been written for extensibility beyond the bounds of the 
   
 Below are some plots created by this model using the method `graphSIR`.  
   
-![SIR plot](SIRe.png)  
+![SIR plot](media/SIRe.png)  
   
-![Four SIRV plots using different ratio of vaccinations](SIRV.png)
+![Four SIRV plots using different ratio of vaccinations](media/SIRV.png)
